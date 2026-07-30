@@ -21,7 +21,25 @@ def client():
     return TestClient(app)
 
 
-def test_delete_participant_unregisters_student(client):
+def test_get_activities_returns_activity_list(client):
+    response = client.get("/activities")
+
+    assert response.status_code == 200
+    assert "Chess Club" in response.json()
+
+
+def test_signup_endpoint_registers_participant(client):
+    response = client.post(
+        "/activities/Chess%20Club/signup",
+        params={"email": "student@mergington.edu"},
+    )
+
+    assert response.status_code == 200
+    assert response.json()["message"] == "Signed up student@mergington.edu for Chess Club"
+    assert "student@mergington.edu" in activities["Chess Club"]["participants"]
+
+
+def test_unregister_endpoint_removes_participant(client):
     response = client.delete(
         "/activities/Chess%20Club/signup",
         params={"email": "michael@mergington.edu"},
